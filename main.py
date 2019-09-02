@@ -6,8 +6,11 @@ from bokeh.io import curdoc, show
 from bokeh.plotting import figure
 from bokeh.models import Title, GeoJSONDataSource, LogColorMapper, LinearColorMapper, ColorBar, Slider, HoverTool
 from bokeh.palettes import brewer
-from bokeh.layouts import widgetbox, column
+from bokeh.layouts import widgetbox, column, row
+from bokeh.models.widgets import Button, TextInput
 import os
+import Stream
+
 
 fileDir = os.path.dirname(os.path.abspath(__file__)) + "/shape_files/"
 lod_changed = True
@@ -17,18 +20,19 @@ shape_file_ger = fileDir + "us_states.shp"
 datafile = 'obese.csv'
 
 
-gdf_world = gpd.read_file(shape_file)[['ISO_A2', 'ADMIN', 'TYPE', 'geometry']]
+gdf_country = gpd.read_file(
+    shape_file)[['ISO_A2', 'ADMIN', 'TYPE', 'geometry']]
 
-gdf_ger = gpd.read_file(shape_file_ger)[['postal', 'name', 'type', 'geometry']]
+gdf_state = gpd.read_file(shape_file_ger)[
+    ['postal', 'name', 'type', 'geometry']]
 
 
-gdf_world.columns = ['name', 'full_name', 'type', 'geometry']
+gdf_country.columns = ['name', 'full_name', 'type', 'geometry']
+gdf_state.columns = ['name', 'full_name', 'type', 'geometry']
 
-gdf_ger.columns = ['name', 'full_name', 'type', 'geometry']
+gdf_country = gdf_country.drop(gdf_country.index[159])
 
-gdf_world = gdf_world.drop(gdf_world.index[159])
-
-dataframesList = [gdf_ger, gdf_world]
+dataframesList = [gdf_state, gdf_country]
 
 rdf = gpd.GeoDataFrame(pd.concat(dataframesList, ignore_index=True))
 rdf['count'] = 0
@@ -39,11 +43,11 @@ country_rdf = rdf[rdf['type'] != 'State']
 state_rdf = rdf[rdf['type'] == 'State']
 
 
-country_json = json.loads(country_rdf.to_json())
-country_data = json.dumps(country_json)
+country_set = set(country_rdf['name'])
+state_set = set(state_rdf['name'])
 
-state_json = json.loads(state_rdf.to_json())
-state_data = json.dumps(state_json)
+country_data = json.dumps(json.loads(country_rdf.to_json()))
+state_data = json.dumps(json.loads(state_rdf.to_json()))
 
 
 geosource = GeoJSONDataSource(geojson=country_data)
@@ -63,11 +67,13 @@ color_bar = ColorBar(background_fill_color="#222222", color_mapper=color_mapper,
                      border_line_color=None, location='center', orientation='horizontal', major_label_overrides=tick_labels, major_label_text_color="white")
 
 
-p = figure(title="Share of adults who are obese, 2016", tooltips=None,
-           width=1400, height=720, tools="pan,wheel_zoom", active_scroll="wheel_zoom", title_location="above",)
-p.title.align = "center"
+p = figure(tooltips=None,
+           width=1500, height=720, tools="pan,wheel_zoom", active_scroll="wheel_zoom", title_location="above",)
+
 p.grid.visible = False
 p.toolbar.logo = None
+p.xaxis.visible = False
+p.yaxis.visible = False
 p.toolbar_location = None
 p.background_fill_color = "#2a2a2a"
 
@@ -103,8 +109,17 @@ def update_lod(attr, new, old):
             lod_changed = True
 
 
+def test_click():
+    print('Start')
+
+
 p.x_range.on_change('end', update_lod)
-layout = column(p)
+start_button = Button(label="Start", button_type="primary", width=100)
+start_button.on_click(test_click)
+stop_button = Button(label="Stop", button_type="danger", width=100)
+stop_button.on_click(test_click)
+text_input = TextInput(value="default", width=600)
+layout = column(row(text_input, start_button, stop_button), p)
 
 
 curdoc().add_root(layout)
