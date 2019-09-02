@@ -36,7 +36,7 @@ gdf_world = gdf_world.drop(gdf_world.index[159])
 # merged = gdf_world.merge(gdf_ger, left_on='country_code',
 #                          right_on='code', how='left')
 # # merged.fillna('No data', inplace=True)
-merged_json = json.loads(gdf_ger.to_json())
+merged_json = json.loads(gdf_world.to_json())
 json_data = json.dumps(merged_json)
 
 
@@ -80,8 +80,8 @@ p.background_fill_color = "#2a2a2a"
 cr = p.patches('xs', 'ys', source=geosource,
                line_color='#dedede', line_width=0.5, fill_alpha=1, hover_fill_color="pink", hover_line_color="pink")
 
-# p.add_tools(HoverTool(tooltips=[
-#     ("Country", "@country"), ("per_cent_obesity", "@per_cent_obesity")], renderers=[cr]))
+p.add_tools(HoverTool(tooltips=[
+    ("Country", "@country_code"), ("per_cent_obesity", "@per_cent_obesity")], renderers=[cr]))
 p.add_layout(color_bar, 'below')
 
 
@@ -97,9 +97,10 @@ def update_title(attr, new, old):
         if abs(p.x_range.start - p.x_range.end) < 140 and lod_changed:
 
             print("detail")
-            # gdf_world = gdf_world.drop(gdf_world.index[121])
-            # gdf_world = gdf_world.drop(gdf_world.index[4])
-            dataframesList = [gdf_ger, gdf_world]
+            gdf_world_remove_cont = gdf_world.drop(gdf_world.index[121])
+            gdf_world_remove_cont = gdf_world_remove_cont.drop(
+                gdf_world_remove_cont.index[4])
+            dataframesList = [gdf_ger, gdf_world_remove_cont]
 
             rdf = gpd.GeoDataFrame(
                 pd.concat(dataframesList, ignore_index=True))
@@ -117,7 +118,7 @@ def update_title(attr, new, old):
             lod_changed = True
 
 
-#p.x_range.on_change('end', update_title)
+p.x_range.on_change('end', update_title)
 layout = column(p)
 
 
