@@ -8,10 +8,10 @@ import datetime
 import main
 
 
-access_token = "1118134186274062339-MGNkDPMhhQn0uwZlVY73T1tFvJvJ8w"
-access_token_secret = "D6eXlgVJiJ5q3RQBAO03GhizanMVItD8dIZOhsBvujhUO"
-consumer_key = "WC98mcJLSHMNna64T0EyzhGhV"
-consumer_secret = "UKp18iWGxIZxcriW0nl1MD9b12R8fP7TIEUNb83eX1M91Vbzq9"
+access_token = ""
+access_token_secret = ""
+consumer_key = ""
+consumer_secret = ""
 
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
