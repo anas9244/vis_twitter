@@ -7,21 +7,22 @@ from bokeh.plotting import figure
 from bokeh.models import Title, GeoJSONDataSource, LogColorMapper, LinearColorMapper, ColorBar, Slider, HoverTool
 from bokeh.palettes import brewer
 from bokeh.layouts import widgetbox, column
+import os
 
-
+fileDir = os.path.dirname(os.path.abspath(__file__)) + "/shape_files/"
 lod_changed = True
-shape_file = 'shape_files/ne_110m_admin_0_countries.shp'
-shape_file_ger = "us_states/ne_110m_admin_1_states_provinces_lakes.shp"
+shape_file = fileDir + 'ne_110m_admin_0_countries.shp'
+shape_file_ger = fileDir + "us_states.shp"
 datafile = 'obese.csv'
 
 
 gdf_world = gpd.read_file(shape_file)[['ADM0_A3', 'geometry']]
-#gdf_ger = gpd.read_file(shape_file_ger)[['name', 'geometry']]
+gdf_ger = gpd.read_file(shape_file_ger)[['name', 'geometry']]
 
 
 gdf_world.columns = ['country_code', 'geometry']
 
-#gdf_ger.columns = ['country_code', 'geometry']
+gdf_ger.columns = ['country_code', 'geometry']
 
 gdf_world = gdf_world.drop(gdf_world.index[159])
 
@@ -35,7 +36,7 @@ gdf_world = gdf_world.drop(gdf_world.index[159])
 # merged = gdf_world.merge(gdf_ger, left_on='country_code',
 #                          right_on='code', how='left')
 # # merged.fillna('No data', inplace=True)
-merged_json = json.loads(gdf_world.to_json())
+merged_json = json.loads(gdf_ger.to_json())
 json_data = json.dumps(merged_json)
 
 
@@ -79,9 +80,9 @@ p.background_fill_color = "#2a2a2a"
 cr = p.patches('xs', 'ys', source=geosource,
                line_color='#dedede', line_width=0.5, fill_alpha=1, hover_fill_color="pink", hover_line_color="pink")
 
-p.add_tools(HoverTool(tooltips=[
-    ("Country", "@country"), ("per_cent_obesity", "@per_cent_obesity")], renderers=[cr]))
-#p.add_layout(color_bar, 'below')
+# p.add_tools(HoverTool(tooltips=[
+#     ("Country", "@country"), ("per_cent_obesity", "@per_cent_obesity")], renderers=[cr]))
+p.add_layout(color_bar, 'below')
 
 
 # p.lod_factor = 10000
