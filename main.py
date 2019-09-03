@@ -6,7 +6,7 @@ from bokeh.io import curdoc, show
 from bokeh.plotting import figure
 from bokeh.models import Title, GeoJSONDataSource, LogColorMapper, LinearColorMapper, ColorBar, Slider, HoverTool
 from bokeh.palettes import brewer
-from bokeh.layouts import widgetbox, column, row, Spacer
+from bokeh.layouts import widgetbox, column, row, Spacer, gridplot
 from bokeh.models.widgets import Button, TextInput
 import os
 import pickle
@@ -181,15 +181,21 @@ def stop_button_click():
 
 
 p.x_range.on_change('end', update_lod)
-start_button = Button(label="Start", button_type="primary", width=100)
+start_button = Button(label="Start", button_type="primary", width=80)
 start_button.on_click(start_button_click)
-stop_button = Button(label="Stop", button_type="danger", width=100)
+stop_button = Button(label="Stop", button_type="danger", width=80)
 stop_button.on_click(stop_button_click)
-text_input = TextInput(value="Enter query here", width=600)
+text_input = TextInput(placeholder="Enter query here", width=400)
 
+spacer_row = Spacer(width=450)
+spacer_pad_col = Spacer(height=20)
+spacer_pad_row = Spacer(width=100)
+spacer_col = Spacer(height=20)
+layout = column(row(
+    spacer_row, text_input, start_button, stop_button, spacer_row), spacer_col, p)
 
-spacer = Spacer(width=320)
-layout = column(row(spacer, text_input, start_button, stop_button), p)
+main_layout = row(spacer_pad_row, column(
+    spacer_pad_col, layout, spacer_pad_col), spacer_pad_row)
 
 
 def update_counts():
@@ -222,6 +228,6 @@ def flash():
 
 
 curdoc().add_periodic_callback(flash, 200)
-curdoc().add_root(layout)
+curdoc().add_root(main_layout)
 
 show(p)
