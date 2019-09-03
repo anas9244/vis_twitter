@@ -6,7 +6,7 @@ from bokeh.io import curdoc, show
 from bokeh.plotting import figure
 from bokeh.models import Title, GeoJSONDataSource, LogColorMapper, LinearColorMapper, ColorBar, Slider, HoverTool
 from bokeh.palettes import brewer
-from bokeh.layouts import widgetbox, column, row
+from bokeh.layouts import widgetbox, column, row, Spacer
 from bokeh.models.widgets import Button, TextInput
 import os
 import pickle
@@ -185,8 +185,11 @@ start_button = Button(label="Start", button_type="primary", width=100)
 start_button.on_click(start_button_click)
 stop_button = Button(label="Stop", button_type="danger", width=100)
 stop_button.on_click(stop_button_click)
-text_input = TextInput(value="default", width=600)
-layout = column(row(text_input, start_button, stop_button), p)
+text_input = TextInput(value="Enter query here", width=600)
+
+
+spacer = Spacer(width=320)
+layout = column(row(spacer, text_input, start_button, stop_button), p)
 
 
 def update_counts():
